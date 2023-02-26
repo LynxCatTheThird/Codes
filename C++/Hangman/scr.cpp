@@ -387,7 +387,7 @@ string randomWord_things_difficult() {
 		"bookshell",
 		"flashlight",
 		"furniture",
-		"telephone", 
+		"telephone",
 		"television",
 		"window"
 	};
@@ -400,7 +400,7 @@ int letterFill(char guess, string secretword, string &guessword) {
 	//guessword-->指向填空
 	int matches = 0; //猜对个数
 	int len = secretword.length();
-	
+
 	for (int i = 0; i < len; i++) {
 		// 是否已经在之前的猜测中匹配了这个字母？
 		if (guess == guessword[i]) return 0;
