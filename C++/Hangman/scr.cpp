@@ -1,10 +1,9 @@
-// https://github.com/Hotsotse/Hang-man
 #include <iostream>
 #include <string>
 #include <random>
 using namespace std;
 
-int random(int a, int b){
+int random(int a, int b) {
 	thread_local mt19937 eng{random_device{}()};
 	uniform_int_distribution<int> dist(a, b);
 	return dist(eng);
@@ -185,231 +184,228 @@ string randomWord_countries() {
 	return words[random(0, 170)];
 }
 
-string randomWord_chem(){
+string randomWord_chem() {
 	string words[] = {
-		"Hydrogen",
-		"Helium",
-		"Lithium",
-		"Beryllium",
-		"Boron",
-		"Carbon",
-		"Nitrogen",
-		"Oxygen",
-		"Fluorine",
-		"Neon",
-		"Sodium",
-		"Magnesium",
+		"Actinium",
 		"Aluminium",
-		"Silicon",
-		"Phosphorus",
-		"Sulphur",
-		"Chlorine",
+		"Americium",
+		"Antimony",
 		"Argon",
-		"Potassium",
+		"Arsenic",
+		"Astatine",
+		"Barium",
+		"Berkelium",
+		"Beryllium",
+		"Bismuth",
+		"Bohrium",
+		"Boron",
+		"Bromine",
+		"Cadmium",
 		"Calcium",
-		"Scandium",
-		"Titanium",
-		"Vanadium",
+		"Californium",
+		"Carbon",
+		"Cerium",
+		"Cesium",
+		"Chlorine",
 		"Chromium",
-		"Manganese",
-		"Iron",
 		"Cobalt",
-		"Nickel",
+		"Copernicium",
 		"Copper",
-		"Zinc",
+		"Curium",
+		"Darmstadtium",
+		"Dubnium",
+		"Dysprosium",
+		"Einsteinium",
+		"Erbium",
+		"Europium",
+		"Fermium",
+		"Flerovium",
+		"Fluorine",
+		"Francium",
+		"Gadolinium",
 		"Gallium",
 		"Germanium",
-		"Arsenic",
-		"Selenium",
-		"Bromine",
-		"Krypton",
-		"Rubidium",
-		"Strontium",
-		"Yttrium",
-		"Zirconium",
-		"Niobium",
-		"Molybdenum",
-		"Technetium",
-		"Ruthenium",
-		"Rhodium",
-		"Palladium",
-		"Silver",
-		"Cadmium",
-		"Indium",
-		"Tin",
-		"Antimony",
-		"Tellurium",
-		"Iodine",
-		"Xenon",
-		"Cesium",
-		"Barium",
-		"Lanthanum",
-		"Cerium",
-		"Praseodymium",
-		"Neodymium",
-		"Promethium",
-		"Samarium",
-		"Europium",
-		"Gadolinium",
-		"Terbium",
-		"Dysprosium",
-		"Holmium",
-		"Erbium",
-		"Thulium",
-		"Ytterbium",
-		"Lutetium",
-		"Hafnium",
-		"Tantalum",
-		"Tungsten",
-		"Rhenium",
-		"Osmium",
-		"Iridium",
-		"Platinum",
 		"Gold",
-		"Mercury",
-		"Thallium",
-		"Lead",
-		"Bismuth",
-		"Polonium",
-		"Astatine",
-		"Radon",
-		"Francium",
-		"Radium",
-		"Actinium",
-		"Thorium",
-		"Protactinium",
-		"Uranium",
-		"Neptunium",
-		"Plutonium",
-		"Americium",
-		"Curium",
-		"Berkelium",
-		"Californium",
-		"Einsteinium",
-		"Fermium",
-		"Mendelevium",
-		"Nobelium",
-		"Lawrencium",
-		"Rutherfordium",
-		"Dubnium",
-		"Seaborgium",
-		"Bohrium",
+		"Hafnium",
 		"Hassium",
+		"Helium",
+		"Holmium",
+		"Hydrogen",
+		"Indium",
+		"Iodine",
+		"Iridium",
+		"Iron",
+		"Krypton",
+		"Lanthanum",
+		"Lawrencium",
+		"Lead",
+		"Lithium",
+		"Livermorium",
+		"Lutetium",
+		"Magnesium",
+		"Manganese",
 		"Meitnerium",
-		"Darmstadtium",
-		"Roentgenium",
-		"Copernicium",
-		"Flerovium",
-		"Nihonium",
+		"Mendelevium",
+		"Mercury",
+		"Molybdenum",
 		"Moscovium",
-		"Tennessine",
+		"Neodymium",
+		"Neon",
+		"Neptunium",
+		"Nickel",
+		"Nihonium",
+		"Niobium",
+		"Nitrogen",
+		"Nobelium",
 		"Oganesson",
-		"Livermorium"
+		"Osmium",
+		"Oxygen",
+		"Palladium",
+		"Phosphorus",
+		"Platinum",
+		"Plutonium",
+		"Polonium",
+		"Potassium",
+		"Praseodymium",
+		"Promethium",
+		"Protactinium",
+		"Radium",
+		"Radon",
+		"Rhenium",
+		"Rhodium",
+		"Roentgenium",
+		"Rubidium",
+		"Ruthenium",
+		"Rutherfordium",
+		"Samarium",
+		"Scandium",
+		"Seaborgium",
+		"Selenium",
+		"Silicon",
+		"Silver",
+		"Sodium",
+		"Strontium",
+		"Sulphur",
+		"Tantalum",
+		"Technetium",
+		"Tellurium",
+		"Tennessine",
+		"Terbium",
+		"Thallium",
+		"Thorium",
+		"Thulium",
+		"Tin",
+		"Titanium",
+		"Tungsten",
+		"Uranium",
+		"Vanadium",
+		"Xenon",
+		"Ytterbium",
+		"Yttrium",
+		"Zinc",
+		"Zirconium"
 	};
 	return words[random(0, 117)];
 }
 
-string randomWord_animal_easy(){
+string randomWord_animal_easy() {
 	string words[] = {
 		"ant",
 		"bat",
 		"bear",
-		"cat",
-		"crow",
-		"cow",
-		"chick",
 		"camel",
+		"cat",
+		"chick",
+		"cow",
+		"crow",
 		"deer",
 		"dog",
 		"duck",
 		"eagle",
+		"fly",
 		"fox",
 		"frog",
-		"fly",
-		"goose",
 		"goat",
+		"goose",
 		"hen",
 		"horse",
 		"kitty",
 		"lion",
 		"pig",
+		"snackwhale",
 		"swan",
-		"snack"
-		"whale",
 		"zebra"
 	};
 	return words[random(0, 25)];
 }
 
-string randomWord_animal_difficult(){
+string randomWord_animal_difficult() {
 	string words[] = {
 		"anteater",
-		"butterfly",
 		"bullfrog",
-		"chicken",
+		"butterfly",
 		"canary",
+		"chicken",
 		"dolphin",
 		"donkey",
 		"drangon",
-		"drangonfly"
+		"drangonfly",
 		"elephant",
 		"firefly",
 		"giraffe",
-		"kitten",
-		"kingfisher",
-		"parrot",
 		"kangaroo",
+		"kingfisher",
+		"kitten",
 		"monkey",
+		"parrot",
 		"turkey"
 	};
 	return words[random(0, 17)];
 }
 
-string randomWord_things_easy(){
+string randomWord_things_easy() {
 	string words[] = {
 		"bus",
 		"cap",
-		"cup",
 		"car",
-		"sofa",
-		"door",
-		"desk",
 		"chair",
-		"tape",
+		"cup",
+		"desk",
+		"door",
 		"glove",
+		"sofa",
+		"tape",
 		"wallet"
 	};
 	return words[random(0, 10)];
 }
 
-string randomWord_things_difficult(){
+string randomWord_things_difficult() {
 	string words[] = {
-		"furniture",
-		"bookshell",
-		"window",
 		"battery",
+		"bookmark",
+		"bookshell",
 		"flashlight",
-		"telephone",
+		"furniture",
+		"telephone", 
 		"television",
-		"bookmark"
+		"window"
 	};
 	return words[random(0, 7)];
 }
 
-int letterFill(char guess, string secretword, string &guessword){
+int letterFill(char guess, string secretword, string &guessword) {
 	//guess-->指向猜的字
 	//secretword-->指向原词
 	//guessword-->指向填空
-	int matches=0;//猜对个数
+	int matches = 0; //猜对个数
 	int len = secretword.length();
 	
-	for (int i = 0; i < len; i++)
-	{
+	for (int i = 0; i < len; i++) {
 		// 是否已经在之前的猜测中匹配了这个字母？
 		if (guess == guessword[i]) return 0;
-		
 		// 猜测的字母是在单词中的字母吗？
-		if (guess == secretword[i]){
+		if (guess == secretword[i]) {
 			guessword[i] = guess;
 			matches++;
 		}
@@ -417,56 +413,50 @@ int letterFill(char guess, string secretword, string &guessword){
 	return matches;
 }
 
-int main(){
+int main() {
 	int tries = 6;// 目前还有的尝试次数
 	int choose;// 选择单词集
 	string word;// 准备好贮存单词
+	char letter; //读入猜测的字母
 	cout << "欢迎来到 Hangman ！\n有以下单词风格可选择：\n1. 动物-简单    2. 元素名    3. 物品-简单\n4. 动物-复杂    5. 地区名    6. 物品-复杂\n请问您选择--->" ;
-	cin>>choose;
-	if(choose == 1){
+	cin >> choose;
+	if (choose == 1) {
 		word = randomWord_animal_easy();// 记录单词
-	}else if(choose == 2){
+	} else if (choose == 2) {
 		word = randomWord_chem();
-		cout<<"注意元素的首字母要大写哦"<<endl;
-	}else if(choose == 3){
+		cout << "注意元素的首字母要大写哦" << endl;
+	} else if (choose == 3) {
 		word = randomWord_things_easy();
-	}else if(choose == 4){
+	} else if (choose == 4) {
 		word = randomWord_animal_difficult();
-	}else if(choose == 5){
+	} else if (choose == 5) {
 		word = randomWord_countries();
-		cout<<"注意地名的首字母要大写哦"<<endl;
-	}else if(choose == 6){
+		cout << "注意地名的首字母要大写哦" << endl;
+	} else if (choose == 6) {
 		word = randomWord_things_difficult();
-	}else {
-		cout<<"嘿，干嘛！\n哼，不跟你玩了！Ｏ(≧口≦)Ｏ";
+	} else {
+		cout << "嘿，干嘛！\n哼，不跟你玩了！Ｏ(≧口≦)Ｏ";
 		return 0;
 	}
-	string unknown(word.length(), '_');// 生成下划线串模拟填空
-	cout << "随机单词已生成！单词的长度是 " << word.length() << " 个字母！" << endl;
-	while (tries > 0){
-		cout << unknown << endl;
-		char letter; // 记录猜测的字母
-		cin >> letter;	
-		if (letterFill(letter, word, unknown) == 0){
-			cout << "哦，错了！没有在单词中发现 " << letter << " 这个字母！" << endl;
+	string unknown(word.length(), '_');// 生成下划线串模拟模仿填空
+	cout << "\n随机单词已生成！单词的长度是 " << word.length() << " 个字母！" << endl;
+	while (tries > 0) {
+		cout << "\n猜一个字母，你还有 " << tries << " 次机会。" << unknown << endl << "你填入：";
+		cin >> letter;
+		if (letterFill(letter, word, unknown) == 0) {
+			cout << "哦，错了！没有在单词中发现字母 " << letter << " ！" << endl;
 			tries--;
-		}
-		else {
+		} else {
 			cout << "猜对了！" << endl;
 		}
-		
-		cout << "猜一个字母，你还有 " << tries << " 次机会。" << endl;
-		
-		if (word == unknown)
-		{
-			cout << word << endl;
+		if (word == unknown) {
+			cout << endl << word << endl;
 			cout << "耶！你赢了！";
 			return 0;
 		}
 	}
 	cout << endl << "嘤嘤嘤，你输了。你被绞死了。" << endl;
 	cout << "这个词是：" << word << endl;
-	//cin.ignore();
-	
 	return 0;
 }
+
