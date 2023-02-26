@@ -5,7 +5,7 @@ using namespace std;
 int main() {
 	//定义
 	long long x1, y1, z1, x2, y2, z2;
-	double d, t, a;
+	double d, t1, t2, a;
 	//输入
 	cout << "确保面向右手系正方向" << endl;
 	cout << "两点坐标--->";
@@ -32,7 +32,6 @@ int main() {
 			cout << "左";
 		}
 		if (z2 > z1) {
-
 			cout << "上";
 		}
 		if (z2 < z1) {
@@ -132,7 +131,7 @@ int main() {
 			cout << "左";
 		}
 		printf("%.15lf", a);
-		a = atan(1.0 / abs(x2 - x1)) * (180 / 3.14159265); //执行acot并从弧度转角度
+		a = atan(1.0 / abs(x2 - x1)) * (180 / 3.14159265); //执行 acot 并从弧度转角度
 		if (x2 > x1) {
 			cout << "°、偏后";
 		}
@@ -163,9 +162,13 @@ int main() {
 	cout << "方向行进 ";
 	/*------------------------------------------计算并输出距离-------------------------------------*/
 	d = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (z2 - z1) * (z2 - z1));
-	t = sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+	t1 = sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+	t2 = sqrt(x2 * x2 + y2 * y2 + z2 * z2);
 	printf("%.15lf", d);
-	cout << " 单位长度" << endl << "目标点距离坐标轴原点 ";
-	printf("%.15lf", t);
+	cout << " 单位长度\n初始点距离坐标轴原点 ";
+	printf("%.15lf", t1);
+	cout << " 单位长度\n目标点距离坐标轴原点 ";
+	printf("%.15lf", t2);
 	cout << " 单位长度" << endl;
 	return 0;
+}
