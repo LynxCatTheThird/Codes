@@ -9,6 +9,5 @@ for file in *.$input_format; do
   # 获取文件名（不含扩展名）
   filename=${file%.*}
   # 调用ffmpeg将文件转换为传出格式，保持视频和音频编码不变
-  ffmpeg -i "$file" -c:v copy -c:a copy "$filename.$output_format"
+  ffmpeg -i "$file" "$filename.$output_format"
 done
-
