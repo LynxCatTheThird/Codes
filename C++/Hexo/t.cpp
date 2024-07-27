@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     system("git submodule update --remote --merge"); // 执行系统命令
   } else if (string(argv[1]) == "u") { // 如果参数为u
     system("ncu -u && npm install"); // 执行系统命令
-  } else if (string(argv[1]) == "s") { // 如果参数为s
+  } else if (string(argv[1]) == "s" || string(argv[1]) == "se") { // 如果参数为s
     system("hexo cl && hexo g && hexo se"); // 执行系统命令
   } else {
     cout << "无效的参数\n"; // 其他情况输出错误信息
