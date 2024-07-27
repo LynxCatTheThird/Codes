@@ -9,9 +9,73 @@
 #include <vector> // 动态数组
 #include <algorithm> // 算法
 
+// 颜色定义
+#define RESET   "\033[0m"
+#define BLACK   "\033[30m"      /* Black */
+#define RED     "\033[31m"      /* Red */
+#define GREEN   "\033[32m"      /* Green */
+#define YELLOW  "\033[33m"      /* Yellow */
+#define BLUE    "\033[34m"      /* Blue */
+#define MAGENTA "\033[35m"      /* Magenta */
+#define CYAN    "\033[36m"      /* Cyan */
+#define WHITE   "\033[37m"      /* White */
+#define BOLDBLACK   "\033[1m\033[30m"      /* Bold Black */
+#define BOLDRED     "\033[1m\033[31m"      /* Bold Red */
+#define BOLDGREEN   "\033[1m\033[32m"      /* Bold Green */
+#define BOLDYELLOW  "\033[1m\033[33m"      /* Bold Yellow */
+#define BOLDBLUE    "\033[1m\033[34m"      /* Bold Blue */
+#define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
+#define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
+#define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
+
 // Configs:
 double SIMILARITY_THRESHOLD = 0.4; // 字符串相似度阈值
-bool displayErrorPrompt = 0;// 是否输出判断失败提示
+short logLevel = 3;// 输出等级，数字越大越详细
+
+// 函数用途：打印动作信息（-1 级）
+// 参数：
+//   message: 要打印的动作信息
+void processPrint(const std::string& message) {
+    if (logLevel >= -1) {
+        std::cout << BLUE << "进程: " << RESET << message << RESET << std::endl;
+    }
+}
+
+// 函数用途：打印错误信息（0 级）
+// 参数：
+//   message: 要打印的错误信息
+void errorPrint(const std::string& message) {
+    if (logLevel >= 0) {
+        std::cerr << BOLDRED << "错误: " << RESET << message << std::endl;
+    }
+}
+
+// 函数用途：打印警告信息（1 级）
+// 参数：
+//   message: 要打印的警告信息
+void warningPrint(const std::string& message) {
+    if (logLevel >= 1) {
+        std::cerr << YELLOW << "警告: " << RESET << message << std::endl;
+    }
+}
+
+// 函数用途：打印拓展信息（2 级）
+// 参数：
+//   message: 要打印的调试信息
+void infoPrint(const std::string& message) {
+    if (logLevel >= 2) {
+        std::cout << GREEN << "信息: " << RESET << message << std::endl;
+    }
+}
+
+// 函数用途：打印调试信息（3 级）
+// 参数：
+//   message: 要打印的调试信息
+void debugPrint(const std::string& message) {
+    if (logLevel >= 3) {
+        std::cout << MAGENTA << "调试: " << RESET << message << std::endl;
+    }
+}
 
 // 函数用途：计算两个字符串之间的 Levenshtein 距离
 // 参数：
@@ -49,7 +113,6 @@ int levenshteinDistance(const std::string& s1, const std::string& s2) {
     // 返回Levenshtein距离
     return dp[len1][len2];
 }
-
 
 // 函数用途：计算两个字符串之间的字符串相似度
 // 参数：
@@ -97,15 +160,13 @@ bool isSimilar(const std::string& s1, const std::string& s2, double threshold) {
 // 返回值：若匹配成功则返回 true，否则返回 false
 bool isOrder(const std::string& s1, const std::string& s2) {
     if (isSubString(s1, s2) || isSubString(s2, s1)) {
-        std::cout << "子串方法判断成功，识别意图为 " << s1 << std::endl;
+        infoPrint("子串方法判断成功，识别意图为 " + s1);
         return true;
     } else if (isSimilar(s1, s2, SIMILARITY_THRESHOLD)) {
-        std::cout << "相似度方法判断成功，识别意图为 " << s1 << std::endl;
+        infoPrint("相似度方法判断成功，识别意图为 " + s1);
         return true;
     } else {
-        if (displayErrorPrompt) {
-            std::cout << "判断意图不是 " << s1 << std::endl;
-        }
+        debugPrint("判断意图是否为 " + s1 + " 失败");
         return false;
     }
 }
@@ -118,7 +179,7 @@ bool isOrder(const std::string& s1, const std::string& s2) {
 bool isDependenciesPresent(const std::string& filename, const std::string& dependencie) {
     std::ifstream file(filename); // 打开文件
     if (!file.is_open()) {
-        std::cerr << "无法打开" + filename << std::endl; // 输出打开文件失败的信息
+        errorPrint("无法打开" + filename); // 输出打开文件失败的信息
         return false;
     }
     std::string line;
@@ -162,7 +223,7 @@ int executeCommand(const std::string& command) {
 
 // 函数用途：清理 Hexo 产生的缓存文件
 void hexoClean() {
-    std::cout << "清理中..." << std::endl;
+    processPrint("清理 Hexo 缓存文件...");
     std::system("hexo clean > /dev/null");
 }
 
@@ -178,16 +239,17 @@ void hexoServer() {
         std::string command = "hexo server --port " + portStr + " > /dev/null";
         if (!isPortOpen(portNum)) {
             // 创建一个异步任务，使用 executeCommand 函数异步执行 command 命令
-            std::cout << "正在尝试于 " + portStr + " 端口启动 Hexo 本地预览服务器..." << std::endl;
+            processPrint("正在尝试于 " + portStr + " 端口启动 Hexo 本地预览服务器...");
             std::future<int> resultFuture = std::async(std::launch::async, executeCommand, command);
             while (!isPortOpen(portNum)) {// 循环检查端口是否打开
-                std::cout << "Hexo 本地预览服务器尚未启动..." << std::endl;  // 如果端口未打开，则打印服务器尚未启动消息
-                sleep(2);  // 等待 2.5 秒
+                warningPrint("Hexo 本地预览服务器尚未启动...");
+                sleep(2);  // 等待 2 秒
             }
-            std::cout << "Hexo 本地预览服务器已启动于 " + portStr + " 端口" << std::endl;  // 如果端口已打开，则打印服务器已启动消息并结束循环
+            processPrint("Hexo 本地预览服务器已启动于 " + portStr + " 端口。");
+            processPrint("您现在可以访问 http://localhost:" + portStr + "/ 预览效果了。"); // 如果端口已打开，则打印服务器已启动消息并结束循环
             break;
         } else {
-            std::cout << portStr + " 端口已被占用，尝试使用下一个端口..." << std::endl;
+            errorPrint(portStr + " 端口已被占用，尝试使用下一个端口...");
         }
     }
 }
@@ -195,33 +257,33 @@ void hexoServer() {
 // 函数用途：部署 Hexo 静态文件
 void hexoBuild() {
     hexoClean();
-    std::cout << "生成静态文件..." << std::endl;
+    processPrint("生成静态文件...");
     std::system("hexo generate > /dev/null");
-    std::cout << "执行性能优化程序..." << std::endl;
+    processPrint("执行性能优化程序...");
     if (isDependenciesPresent("package.json", "swpp")) {
         std::system("hexo swpp");
     } else {
-        std::cout << "本地项目中不包含 swpp 或无法判断状态" << std::endl;
+        warningPrint("本地项目中不包含 swpp 或无法判断状态");
     }
     if (isDependenciesPresent("package.json", "gulp")) {
         std::system("gulp zip");
     } else {
-        std::cout << "本地项目中不包含 gulp 或无法判断状态" << std::endl;
+        warningPrint("本地项目中不包含 gulp 或无法判断状态");
     }
-    std::cout << "部署至平台..." << std::endl;
+    processPrint("部署静态文件...");
     std::system("hexo d");
     hexoClean();
 }
 
 // 函数用途：显示帮助信息
 void utilHelper() {
-    std::cout << "Hexo 辅助工具" << std::endl;
-    std::cout << "1. 部署静态文件：build、deploy" << std::endl;
-    std::cout << "2. 启动本地预览服务器：server" << std::endl;
-    std::cout << "3. 更新依赖包：updatepackages、update" << std::endl;
-    std::cout << "4. 更新子模块（更新主题）：updatesubmodules、updatetheme" << std::endl;
-    std::cout << "5. 显示帮助信息：help" << std::endl;
-    std::cout << "命令有一定鲁棒性，欢迎翻阅源代码查看具体实现" << std::endl;
+    std::cout << BOLDMAGENTA << "Hexo 辅助工具\n" << RESET << "\
+1. 部署静态文件：build、deploy\n\
+2. 启动本地预览服务器：server\n\
+3. 更新依赖包：packages\n\
+4. 更新子模块（更新主题）：theme\n\
+5. 显示帮助信息：help\n\
+命令有一定鲁棒性，欢迎翻阅源代码查看具体实现\n";
 }
 
 // 函数用途：主函数
@@ -231,22 +293,20 @@ void utilHelper() {
 // 返回值：0 - 成功，1 - 失败
 int main(int argc, char* argv[ ]) {
     if (argc == 1) {
-        std::cout << "请输入参数" << std::endl;
+        errorPrint("请输入参数");
         utilHelper();
         return 1;
-    } else if (isOrder("build", argv[1])) {
+    } else if (isOrder("build", argv[1]) || isOrder("deploy", argv[1])) {
         hexoBuild();
-    } else if (isOrder("updatesubmodules", argv[1]) || isOrder("updatetheme", argv[1])) {
-        std::system("git submodule update --remote --merge");
-    } else if (isOrder("updatepackages", argv[1]) || isOrder("update", argv[1])) {
-        std::system("ncu -u && npm install");
     } else if (isOrder("server", argv[1])) {
         hexoServer();
-    } else if (isOrder("deploy", argv[1])) {
-        utilHelper();
-    }
-    else {
-        std::cout << "无效的参数：所有判断都失败了，无法判断命令意图" << std::endl;
+    } else if (isOrder("theme", argv[1])) {
+        std::system("git submodule update --remote --merge");
+    } else if (isOrder("packages", argv[1])) {
+        std::system("rm -rf package-lock.json && rm -rf node_modules/ && ncu -u && npm install");
+    } else {
+        errorPrint("无效的参数：所有判断都失败了，无法判断命令意图。");
+        errorPrint("您确定 " + std::string(argv[1]) + " 是正确的命令吗？");
         utilHelper();
         return 1;
     }
