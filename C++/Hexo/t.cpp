@@ -1,10 +1,6 @@
 #include <iostream>
 #include <cstdlib>
-#include <string>
-#include <filesystem>
-#include <cstdio> // 加上这个头文件
 using namespace std;
-using namespace std::filesystem;
 
 int main(int argc, char* argv[]) {
   if (argc == 1 || string(argv[1]) == "h") { // 如果没有参数或参数为h
