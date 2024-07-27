@@ -1,11 +1,114 @@
-#include <iostream>
-#include <cstdlib>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <future>
+#include <iostream> // 输入输出
+#include <cstdlib> // 系统命令
+#include <fstream> // 文件输入输出
+#include <string> // 字符串处理
+#include <sstream> // 字符串流处理
+#include <netinet/in.h> // 网络字节序转换
+#include <unistd.h> // 系统调用
+#include <future> // 异步执行
+#include <vector> // 动态数组
+#include <algorithm> // 算法
+
+// Configs:
+double SIMILARITY_THRESHOLD = 0.4; // 字符串相似度阈值
+bool displayErrorPrompt = 0;// 是否输出判断失败提示
+
+// 函数用途：计算两个字符串之间的 Levenshtein 距离
+// 参数：
+//   s1: 字符串1
+//   s2: 字符串2
+// 返回值：两个字符串之间的 Levenshtein 距离
+// 算法：动态规划
+int levenshteinDistance(const std::string& s1, const std::string& s2) {
+    // 初始化字符串长度
+    int len1 = s1.size();
+    int len2 = s2.size();
+    // 创建二维DP数组
+    std::vector<std::vector<int>> dp(len1 + 1, std::vector<int>(len2 + 1, 0));
+
+    // 初始化边界条件
+    for (int i = 0; i <= len1; ++i) {
+        dp[i][0] = i;
+    }
+    for (int j = 0; j <= len2; ++j) {
+        dp[0][j] = j;
+    }
+
+    // 填充DP数组
+    for (int i = 1; i <= len1; ++i) {
+        for (int j = 1; j <= len2; ++j) {
+            // 根据字符是否相等更新DP数组
+            if (s1[i - 1] == s2[j - 1]) {
+                dp[i][j] = dp[i - 1][j - 1];
+            } else {
+                dp[i][j] = std::min({ dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1] }) + 1;
+            }
+        }
+    }
+
+    // 返回Levenshtein距离
+    return dp[len1][len2];
+}
+
+
+// 函数用途：计算两个字符串之间的字符串相似度
+// 参数：
+//   s1: 字符串1
+//   s2: 字符串2
+// 返回值：两个字符串之间的字符串相似度
+// 算法：Levenshtein 距离与字符串长度的比值
+double stringSimilarity(const std::string& s1, const std::string& s2) {
+    // 计算Levenshtein距离
+    int dist = levenshteinDistance(s1, s2);
+    // 计算字符串最大长度
+    int maxLen = std::max(s1.size(), s2.size());
+    // 计算并返回字符串相似度
+    return 1.0 - static_cast<double>(dist) / maxLen;
+}
+
+// 函数用途：判断第二个字符串是否为第一个字符串的头部子串
+// 参数：
+//   s1: 字符串1
+//   s2: 字符串2
+// 返回值：若第二个字符串为第一个字符串的开头一部分则返回true,否则为false 
+// 举例：
+//   s1 = "hello", s2 = "hello world"
+//   isSubString(s1, s2) 返回 true
+//   s1 = "world", s2 = "hello world"
+//   isSubString(s1, s2) 返回 false
+bool isSubString(const std::string& s1, const std::string& s2) {
+    return s2.find(s1) == 0;
+}
+
+// 函数用途：判断两个字符串相似度是否满足阈值
+// 参数：
+//   s1: 字符串1
+//   s2: 字符串2
+//   threshold: 相似度阈值
+// 返回值：若两个字符串相似度大于等于阈值则返回 true，否则返回 false
+bool isSimilar(const std::string& s1, const std::string& s2, double threshold) {
+    return stringSimilarity(s1, s2) >= threshold;
+}
+
+// 函数用途：判断命令意图
+// 参数：
+//   s1: 传入预期的命令
+//   s2: 传入argv[1]
+// 返回值：若匹配成功则返回 true，否则返回 false
+bool isOrder(const std::string& s1, const std::string& s2) {
+    if (isSubString(s1, s2) || isSubString(s2, s1)) {
+        std::cout << "子串方法判断成功，识别意图为 " << s1 << std::endl;
+        return true;
+    } else if (isSimilar(s1, s2, SIMILARITY_THRESHOLD)) {
+        std::cout << "相似度方法判断成功，识别意图为 " << s1 << std::endl;
+        return true;
+    } else {
+        if (displayErrorPrompt) {
+            std::cout << "判断意图不是 " << s1 << std::endl;
+        }
+        return false;
+    }
+}
 
 // 函数用途：检查文件中是否存在特定依赖项
 // 参数：
@@ -49,7 +152,7 @@ bool isPortOpen(int port) {
     }
 }
 
-// 用于异步执行 Hexo 命令
+// 用于异步执行系统命令
 // 输入：const std::string& command - 要执行的命令
 // 输出：int - 命令执行的返回值
 int executeCommand(const std::string& command) {
@@ -57,11 +160,13 @@ int executeCommand(const std::string& command) {
     return std::system(command.c_str());
 }
 
+// 函数用途：清理 Hexo 产生的缓存文件
 void hexoClean() {
     std::cout << "清理中..." << std::endl;
     std::system("hexo clean > /dev/null");
 }
 
+// 函数用途：启动 Hexo 本地预览服务器
 void hexoServer() {
     hexoClean();
     for (int portNum = 4000; portNum <= 65535; portNum++) {
@@ -70,26 +175,24 @@ void hexoServer() {
         ss << portNum;
         std::string portStr = ss.str();
         // 构造命令字符串 command
-        std::string command = "hexo server --port " + portStr + " > /dev/null 2>&1";
+        std::string command = "hexo server --port " + portStr + " > /dev/null";
         if (!isPortOpen(portNum)) {
             // 创建一个异步任务，使用 executeCommand 函数异步执行 command 命令
             std::cout << "正在尝试于 " + portStr + " 端口启动 Hexo 本地预览服务器..." << std::endl;
             std::future<int> resultFuture = std::async(std::launch::async, executeCommand, command);
-            while (true) {
-                if (isPortOpen(portNum)) {  // 循环检查端口是否打开
-                    std::cout << "Hexo 本地预览服务器已启动于 " + portStr + " 端口" << std::endl;  // 如果端口已打开，则打印服务器已启动消息并结束循环
-                    break;
-                } else {
-                    std::cout << "Hexo 本地预览服务器尚未启动..." << std::endl;  // 如果端口未打开，则打印服务器尚未启动消息
-                }
-                sleep(2.5);  // 等待 2.5 秒
+            while (!isPortOpen(portNum)) {// 循环检查端口是否打开
+                std::cout << "Hexo 本地预览服务器尚未启动..." << std::endl;  // 如果端口未打开，则打印服务器尚未启动消息
+                sleep(2);  // 等待 2.5 秒
             }
+            std::cout << "Hexo 本地预览服务器已启动于 " + portStr + " 端口" << std::endl;  // 如果端口已打开，则打印服务器已启动消息并结束循环
+            break;
         } else {
             std::cout << portStr + " 端口已被占用，尝试使用下一个端口..." << std::endl;
         }
     }
 }
 
+// 函数用途：部署 Hexo 静态文件
 void hexoBuild() {
     hexoClean();
     std::cout << "生成静态文件..." << std::endl;
@@ -110,20 +213,41 @@ void hexoBuild() {
     hexoClean();
 }
 
+// 函数用途：显示帮助信息
+void utilHelper() {
+    std::cout << "Hexo 辅助工具" << std::endl;
+    std::cout << "1. 部署静态文件：build、deploy" << std::endl;
+    std::cout << "2. 启动本地预览服务器：server" << std::endl;
+    std::cout << "3. 更新依赖包：updatepackages、update" << std::endl;
+    std::cout << "4. 更新子模块（更新主题）：updatesubmodules、updatetheme" << std::endl;
+    std::cout << "5. 显示帮助信息：help" << std::endl;
+    std::cout << "命令有一定鲁棒性，欢迎翻阅源代码查看具体实现" << std::endl;
+}
+
+// 函数用途：主函数
+// 参数：
+//   argc: 命令行参数个数
+//   argv: 命令行参数数组
+// 返回值：0 - 成功，1 - 失败
 int main(int argc, char* argv[ ]) {
     if (argc == 1) {
         std::cout << "请输入参数" << std::endl;
+        utilHelper();
         return 1;
-    } else if (std::string(argv[1]) == "b") {
+    } else if (isOrder("build", argv[1])) {
         hexoBuild();
-    } else if (std::string(argv[1]) == "ut") {
+    } else if (isOrder("updatesubmodules", argv[1]) || isOrder("updatetheme", argv[1])) {
         std::system("git submodule update --remote --merge");
-    } else if (std::string(argv[1]) == "u") {
+    } else if (isOrder("updatepackages", argv[1]) || isOrder("update", argv[1])) {
         std::system("ncu -u && npm install");
-    } else if (std::string(argv[1]) == "s" || std::string(argv[1]) == "se") {
+    } else if (isOrder("server", argv[1])) {
         hexoServer();
-    } else {
-        std::cout << "无效的参数" << std::endl;
+    } else if (isOrder("deploy", argv[1])) {
+        utilHelper();
+    }
+    else {
+        std::cout << "无效的参数：所有判断都失败了，无法判断命令意图" << std::endl;
+        utilHelper();
         return 1;
     }
     return 0;
