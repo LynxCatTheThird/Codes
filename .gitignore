@@ -1,0 +1,16 @@
+.vscode/
+.idea/
+
+*.exe
+*.dll
+*.so
+t
+
+*.o
+*.out
+o.*
+out.*
+*.i
+*.in
+i.*
+in.*

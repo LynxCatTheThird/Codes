@@ -3,11 +3,14 @@
 #include <fstream> // 文件输入输出
 #include <string> // 字符串处理
 #include <sstream> // 字符串流处理
+#include <iomanip> // 格式化输出
 #include <netinet/in.h> // 网络字节序转换
 #include <unistd.h> // 系统调用
 #include <future> // 异步执行
 #include <vector> // 动态数组
 #include <algorithm> // 算法
+#include <thread> // 线程
+#include <chrono> // 时间
 
 // 颜色定义
 #define RESET   "\033[0m"
@@ -30,7 +33,7 @@
 
 // Configs:
 double SIMILARITY_THRESHOLD = 0.4; // 字符串相似度阈值
-short logLevel = 3;// 输出等级，数字越大越详细
+short logLevel = 2;// 输出等级，数字越大越详细
 
 // 函数用途：打印动作信息（-1 级）
 // 参数：
@@ -75,6 +78,17 @@ void debugPrint(const std::string& message) {
     if (logLevel >= 3) {
         std::cout << MAGENTA << "调试: " << RESET << message << std::endl;
     }
+}
+
+// 函数用途：格式化输出时间
+// 参数：
+//   seconds: 秒数
+//   precision: 精度
+// 返回值：格式化后的时间字符串
+std::string formatDuration(double seconds, int precision) {
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(precision) << seconds;
+    return ss.str();
 }
 
 // 函数用途：计算两个字符串之间的 Levenshtein 距离
@@ -229,37 +243,54 @@ void hexoClean() {
 
 // 函数用途：启动 Hexo 本地预览服务器
 void hexoServer() {
+    auto totalStart = std::chrono::high_resolution_clock::now(); // 开始记录总执行时间
     hexoClean();
     for (int portNum = 4000; portNum <= 65535; portNum++) {
-        // 将整数转换为字符串
-        std::stringstream ss;
-        ss << portNum;
-        std::string portStr = ss.str();
-        // 构造命令字符串 command
+        std::string portStr = std::to_string(portNum);
         std::string command = "hexo server --port " + portStr + " > /dev/null";
         if (!isPortOpen(portNum)) {
-            // 创建一个异步任务，使用 executeCommand 函数异步执行 command 命令
             processPrint("正在尝试于 " + portStr + " 端口启动 Hexo 本地预览服务器...");
+            auto serverStart = std::chrono::high_resolution_clock::now(); // 开始记录 hexo server 启动时间
             std::future<int> resultFuture = std::async(std::launch::async, executeCommand, command);
-            while (!isPortOpen(portNum)) {// 循环检查端口是否打开
-                warningPrint("Hexo 本地预览服务器尚未启动...");
-                sleep(2);  // 等待 2 秒
+
+            if (logLevel >= 1) {
+                int checkCount = 0;
+                std::string waitingChars = "|/-\\"; // 等待动画
+                while (!isPortOpen(portNum)) {
+                    if (checkCount % 10 == 0) {  // 每10次检查更新一次输出
+                        std::cerr << "\r\033[33m" << "警告: " << RESET << "等待 Hexo 本地预览服务器启动... " << waitingChars[checkCount / 10 % 4] << std::flush; //这里不够优雅
+                    }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                    checkCount++;
+                }
+                std::cout << std::endl;  // 完成后换行
             }
+
+            auto serverEnd = std::chrono::high_resolution_clock::now(); // 结束记录 hexo server 启动时间
+            std::chrono::duration<double> serverElapsed = serverEnd - serverStart; // 计算 hexo server 启动时间
+            processPrint("Hexo 本地预览服务器启动用时: " + formatDuration(serverElapsed.count(), 3) + " 秒");
             processPrint("Hexo 本地预览服务器已启动于 " + portStr + " 端口。");
-            processPrint("您现在可以访问 http://localhost:" + portStr + "/ 预览效果了。"); // 如果端口已打开，则打印服务器已启动消息并结束循环
+            processPrint("您现在可以访问 http://localhost:" + portStr + "/ 预览效果了。");
             break;
         } else {
             errorPrint(portStr + " 端口已被占用，尝试使用下一个端口...");
         }
     }
+    auto totalEnd = std::chrono::high_resolution_clock::now(); // 结束记录总执行时间
+    std::chrono::duration<double> totalElapsed = totalEnd - totalStart; // 计算总执行时间
+    infoPrint("本次操作执行总用时: " + formatDuration(totalElapsed.count(), 3) + " 秒");
 }
 
 // 函数用途：部署 Hexo 静态文件
 void hexoBuild() {
+    auto totalStart = std::chrono::high_resolution_clock::now(); // 开始记录总执行时间
     hexoClean();
     processPrint("生成静态文件...");
+    auto generateStart = std::chrono::high_resolution_clock::now(); // 开始记录 Generate 时间
     std::system("hexo generate > /dev/null");
+    auto generateEnd = std::chrono::high_resolution_clock::now();  // 结束记录 Generate 时间
     processPrint("执行性能优化程序...");
+    auto optimizeStart = std::chrono::high_resolution_clock::now();  // 开始记录优化工具时间
     if (isDependenciesPresent("package.json", "swpp")) {
         std::system("hexo swpp");
     } else {
@@ -270,9 +301,17 @@ void hexoBuild() {
     } else {
         warningPrint("本地项目中不包含 gulp 或无法判断状态");
     }
+    auto optimizeEnd = std::chrono::high_resolution_clock::now(); // 结束记录优化工具时间
     processPrint("部署静态文件...");
     std::system("hexo d");
     hexoClean();
+    auto totalEnd = std::chrono::high_resolution_clock::now(); // 结束记录总执行时间
+    std::chrono::duration<double> generateElapsed = generateEnd - generateStart; // 计算 Generate 时间
+    processPrint("生成静态文件用时: " + formatDuration(generateElapsed.count(), 3) + " 秒");
+    std::chrono::duration<double> optimizeElapsed = optimizeEnd - optimizeStart; // 计算优化工具时间
+    infoPrint("优化工具用时: " + formatDuration(optimizeElapsed.count(), 3) + " 秒");
+    std::chrono::duration<double> totalElapsed = totalEnd - totalStart; // 计算总执行时间
+    infoPrint("本次操作执行总用时: " + formatDuration(totalElapsed.count(), 3) + " 秒");
 }
 
 // 函数用途：显示帮助信息
