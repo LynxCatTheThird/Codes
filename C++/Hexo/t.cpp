@@ -17,15 +17,7 @@ int main(int argc, char* argv[]) {
   } else if (string(argv[1]) == "b") { // 如果参数为b
     system("hexo cl && hexo g && hexo d && hexo cl"); // 执行系统命令
   } else if (string(argv[1]) == "ut") { // 如果参数为ut
-    path git_up = "themes/butterfly/.git.up"; // 定义路径对象
-    path git = "themes/butterfly/.git";
-    if (exists(git_up)) { // 如果.git.up存在
-      std::rename(git_up.c_str(), git.c_str()); // 用std::rename函数重命名为.git
-      system("cd themes/butterfly && git pull"); // 执行系统命令
-      std::rename(git.c_str(), git_up.c_str()); // 用std::rename函数重命名回.git.up
-    } else {
-      cout << ".git.up不存在\n";
-    }
+    system("git submodule update --remote --merge"); // 执行系统命令
   } else if (string(argv[1]) == "u") { // 如果参数为u
     system("ncu -u && npm install"); // 执行系统命令
   } else if (string(argv[1]) == "s") { // 如果参数为s
