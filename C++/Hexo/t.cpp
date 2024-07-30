@@ -12,6 +12,16 @@
 #include <thread> // 线程
 #include <chrono> // 时间
 
+// Configs:
+double SIMILARITY_THRESHOLD = 0.4; // 字符串相似度阈值
+short logLevel = 2;// 输出等级，数字越大越详细
+std::string dependenciesSearchingFile = "package.json"; // 依赖搜索文件
+std::string additionalTools[3][2] = {
+    // 格式：{查询关键字, 工具命令}
+    {"swpp","hexo swpp"},
+    {"gulp","gulp zip"},
+    {"algolia","hexo algolia"}
+};
 // 颜色定义
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
@@ -30,10 +40,6 @@
 #define BOLDMAGENTA "\033[1m\033[35m"      /* Bold Magenta */
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
-
-// Configs:
-double SIMILARITY_THRESHOLD = 0.4; // 字符串相似度阈值
-short logLevel = 2;// 输出等级，数字越大越详细
 
 // 函数用途：打印动作信息（-1 级）
 // 参数：
@@ -289,27 +295,26 @@ void hexoBuild() {
     auto generateStart = std::chrono::high_resolution_clock::now(); // 开始记录 Generate 时间
     std::system("hexo generate > /dev/null");
     auto generateEnd = std::chrono::high_resolution_clock::now();  // 结束记录 Generate 时间
-    processPrint("执行性能优化程序...");
-    auto optimizeStart = std::chrono::high_resolution_clock::now();  // 开始记录优化工具时间
-    if (isDependenciesPresent("package.json", "swpp")) {
-        std::system("hexo swpp");
-    } else {
-        warningPrint("本地项目中不包含 swpp 或无法判断状态");
+    processPrint("执行附属命令...");
+    std::size_t additionalToolsRowCount = sizeof(additionalTools) / sizeof(additionalTools[0]);// 获取行数
+    auto additionalStart = std::chrono::high_resolution_clock::now();  // 开始记录附属工具时间
+    for (unsigned long additionalToolsRunRow = 0; additionalToolsRunRow < additionalToolsRowCount; additionalToolsRunRow++) {
+        if (isDependenciesPresent(dependenciesSearchingFile, additionalTools[additionalToolsRunRow][0])) {
+            processPrint("正在执行 " + additionalTools[additionalToolsRunRow][0] + " ...");
+            std::system(additionalTools[additionalToolsRunRow][1].c_str());
+        } else {
+            warningPrint("本地项目中未安装 "+additionalTools[additionalToolsRunRow][0] + " 或检索出错，跳过执行。");
+        }
     }
-    if (isDependenciesPresent("package.json", "gulp")) {
-        std::system("gulp zip");
-    } else {
-        warningPrint("本地项目中不包含 gulp 或无法判断状态");
-    }
-    auto optimizeEnd = std::chrono::high_resolution_clock::now(); // 结束记录优化工具时间
+    auto additionalEnd = std::chrono::high_resolution_clock::now(); // 结束记录附属工具时间
     processPrint("部署静态文件...");
     std::system("hexo d");
     hexoClean();
     auto totalEnd = std::chrono::high_resolution_clock::now(); // 结束记录总执行时间
     std::chrono::duration<double> generateElapsed = generateEnd - generateStart; // 计算 Generate 时间
     processPrint("生成静态文件用时: " + formatDuration(generateElapsed.count(), 3) + " 秒");
-    std::chrono::duration<double> optimizeElapsed = optimizeEnd - optimizeStart; // 计算优化工具时间
-    infoPrint("优化工具用时: " + formatDuration(optimizeElapsed.count(), 3) + " 秒");
+    std::chrono::duration<double> additionalElapsed = additionalEnd - additionalStart; // 计算附属工具时间
+    infoPrint("附属工具用时: " + formatDuration(additionalElapsed.count(), 3) + " 秒");
     std::chrono::duration<double> totalElapsed = totalEnd - totalStart; // 计算总执行时间
     infoPrint("本次操作执行总用时: " + formatDuration(totalElapsed.count(), 3) + " 秒");
 }
