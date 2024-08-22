@@ -46,7 +46,7 @@ std::string additionalTools[3][2] = {
 //   message: 要打印的动作信息
 void processPrint(const std::string& message) {
     if (logLevel >= -1) {
-        std::cout << BLUE << "进程: " << RESET << message << RESET << std::endl;
+        std::cout << BLUE << "[进程] " << RESET << message << std::endl;
     }
 }
 
@@ -55,7 +55,7 @@ void processPrint(const std::string& message) {
 //   message: 要打印的错误信息
 void errorPrint(const std::string& message) {
     if (logLevel >= 0) {
-        std::cerr << BOLDRED << "错误: " << RESET << message << std::endl;
+        std::cerr << BOLDRED << "[错误] " << RESET << message << std::endl;
     }
 }
 
@@ -64,7 +64,7 @@ void errorPrint(const std::string& message) {
 //   message: 要打印的警告信息
 void warningPrint(const std::string& message) {
     if (logLevel >= 1) {
-        std::cerr << YELLOW << "警告: " << RESET << message << std::endl;
+        std::cerr << YELLOW << "[警告] " << RESET << message << std::endl;
     }
 }
 
@@ -73,7 +73,7 @@ void warningPrint(const std::string& message) {
 //   message: 要打印的调试信息
 void infoPrint(const std::string& message) {
     if (logLevel >= 2) {
-        std::cout << GREEN << "信息: " << RESET << message << std::endl;
+        std::cout << GREEN << "[信息] " << RESET << message << std::endl;
     }
 }
 
@@ -82,11 +82,11 @@ void infoPrint(const std::string& message) {
 //   message: 要打印的调试信息
 void debugPrint(const std::string& message) {
     if (logLevel >= 3) {
-        std::cout << MAGENTA << "调试: " << RESET << message << std::endl;
+        std::cout << MAGENTA << "[调试] " << RESET << message << std::endl;
     }
 }
 
-// 函数用途：格式化输出时间
+// 函数用途：格式化执行用时
 // 参数：
 //   seconds: 秒数
 //   precision: 精度
@@ -264,7 +264,7 @@ void hexoServer() {
                 std::string waitingChars = "|/-\\"; // 等待动画
                 while (!isPortOpen(portNum)) {
                     if (checkCount % 10 == 0) {  // 每10次检查更新一次输出
-                        std::cerr << "\r\033[33m" << "警告: " << RESET << "等待 Hexo 本地预览服务器启动... " << waitingChars[checkCount / 10 % 4] << std::flush; //这里不够优雅
+                        std::cerr << "\r\033[33m" << "[警告] " << RESET << "等待 Hexo 本地预览服务器启动... " << waitingChars[checkCount / 10 % 4] << std::flush; //这里不够优雅
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(100));
                     checkCount++;
