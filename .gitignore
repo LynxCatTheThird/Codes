@@ -1,0 +1,27 @@
+# 忽略编译器生成的文件和IDE配置文件
+.vscode/
+.idea/
+.vscode*
+
+# 编译产物
+*.o
+*.obj
+*.d
+*.out
+*.exe
+
+# 静态库与动态库
+*.a
+*.lib
+*.so
+*.dll
+t
+
+# 测试样例
+*.out
+o.*
+out.*
+*.i
+*.in
+i.*
+in.*
