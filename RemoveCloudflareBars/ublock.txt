@@ -1,0 +1,1 @@
+dash.cloudflare.com##.widget[data-testid="recommendations-component"]
