@@ -3,7 +3,7 @@
 ### 编译使用
 
 ```bash
-g++ -o t t.cpp -O3 -std=c++23 -Wall -Wextra -Wpedantic && mv t ~/.local/bin/t && chmod +x ~/.local/bin/t
+make all
 ```
 
 ### 目前已有的功能：
@@ -20,7 +20,7 @@ g++ -o t t.cpp -O3 -std=c++23 -Wall -Wextra -Wpedantic && mv t ~/.local/bin/t &&
 >[!NOTE]
 这一定程度上体现了日程安排，但这不是日程
 
-- [ ] 进一步优化 `hexo server` 命令的异步执行
+- [x] 进一步优化 `hexo server` 命令的异步执行
 - [ ] 完善文档，拒绝让简单的事情变得复杂
 - [ ] 输出命令执行结果并加以分析、建议
 - [ ] 日志转储，更方便地追踪问题
@@ -29,5 +29,5 @@ g++ -o t t.cpp -O3 -std=c++23 -Wall -Wextra -Wpedantic && mv t ~/.local/bin/t &&
 
 ### 已知问题：
 
-- [ ] `hexo server` 命令在某些情况下会卡住，无法正常退出
+- [x] `hexo server` 命令在某些情况下会卡住，无法正常退出
 - [ ] 本人缺少 `yarn` 的经验，请反馈问题
