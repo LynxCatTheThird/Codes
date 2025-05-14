@@ -1,5 +1,4 @@
 #pragma once
-#include <string> // 字符串处理
 
 // Configs:
 double SIMILARITY_THRESHOLD = 0.4; // 字符串相似度阈值

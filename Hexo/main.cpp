@@ -1,4 +1,19 @@
-#include <iostream> //输入输出
+// C++ 标准输入输出
+#include <iostream> // 输入输出
+#include <iomanip>  // 格式化输出
+#include <sstream>  // 字符串流处理
+
+// 文件相关
+#include <fstream>  // 文件输入输出
+
+// 字符串与算法
+#include <string>   // 字符串处理
+#include <algorithm> // 算法
+
+// 多线程与异步
+#include <thread>   // 线程
+#include <future>   // 异步执行
+#include <chrono>   // 时间
 
 #include <_configs.hpp> //配置文件
 #include <utils.hpp> //辅助函数
