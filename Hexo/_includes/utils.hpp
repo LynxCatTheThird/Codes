@@ -1,4 +1,5 @@
 #pragma once
+
 #include <netinet/in.h> // 网络字节序转换
 #include <unistd.h> // 系统调用
 
@@ -12,7 +13,7 @@
 bool isDependenciesPresent(const std::string& filename, const std::string& dependencie) {
     std::ifstream file(filename); // 打开文件
     if (!file.is_open()) {
-        errorPrint("无法打开" + filename); // 输出打开文件失败的信息
+        spdlog::error("无法打开" + filename); // 输出打开文件失败的信息
         return false;
     }
     std::string line;

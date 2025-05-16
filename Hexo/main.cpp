@@ -15,9 +15,8 @@
 #include <future>   // 异步执行
 #include <chrono>   // 时间
 
-#include <_configs.hpp> //配置文件
+#include <configs.hpp> //配置文件
 #include <utils.hpp> //辅助函数
-#include <logs.hpp> //日志
 #include <algorithms.hpp> //辅助算法
 #include <hexo.hpp> //主体
 
@@ -28,13 +27,13 @@
 // 返回值：若匹配成功则返回 true，否则返回 false
 bool isOrder(const std::string& s1, const std::string& s2) {
     if (isSubString(s1, s2) || isSubString(s2, s1)) {
-        infoPrint("子串方法判断成功，识别意图为 " + s1);
+        spdlog::info("子串方法判断成功，识别意图为 " + s1);
         return true;
-    } else if (isSimilar(s1, s2, SIMILARITY_THRESHOLD)) {
-        infoPrint("相似度方法判断成功，识别意图为 " + s1);
+    } else if (isSimilar(s1, s2, config.similarityThreshold)) {
+        spdlog::info("相似度方法判断成功，识别意图为 " + s1);
         return true;
     } else {
-        debugPrint("判断意图是否为 " + s1 + " 失败");
+        spdlog::debug("判断意图是否为 " + s1 + " 失败");
         return false;
     }
 }
@@ -57,9 +56,10 @@ void utilHelper() {
 // 返回值：0 - 成功，1 - 失败
 int main(int argc, char* argv[ ]) {
     initLogger();
+    config.loadFromYamlIfExists();
 
     if (argc == 1) {
-        errorPrint("请输入参数");
+        spdlog::error("请输入参数");
         utilHelper();
         return 1;
     } else if (isOrder("build", argv[1]) || isOrder("deploy", argv[1])) {
@@ -71,8 +71,8 @@ int main(int argc, char* argv[ ]) {
     } else if (isOrder("packages", argv[1])) {
         std::system("rm -rf package-lock.json && rm -rf node_modules/ && ncu -u && npm install");
     } else {
-        errorPrint("无效的参数：所有判断都失败了，无法判断命令意图。");
-        errorPrint("您确定 " + std::string(argv[1]) + " 是正确的命令吗？");
+        spdlog::error("无效的参数：所有判断都失败了，无法判断命令意图");
+        spdlog::error("您确定 " + std::string(argv[1]) + " 是正确的命令吗？");
         utilHelper();
         return 1;
     }

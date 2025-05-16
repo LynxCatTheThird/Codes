@@ -10,41 +10,6 @@ inline void initLogger() {
     spdlog::set_level(spdlog::level::trace);  // 打开全部等级
 }
 
-// 函数用途：打印动作信息（-1 级）
-// 参数：
-//   message: 要打印的动作信息
-inline void processPrint(const std::string& message) {
-    if (logLevel >= -1) spdlog::info(message);
-}
-
-// 函数用途：打印错误信息（0 级）
-// 参数：
-//   message: 要打印的错误信息
-inline void errorPrint(const std::string& message) {
-    if (logLevel >= 0) spdlog::error(message);
-}
-
-// 函数用途：打印警告信息（1 级）
-// 参数：
-//   message: 要打印的警告信息
-inline void warningPrint(const std::string& message) {
-    if (logLevel >= 1) spdlog::warn(message);
-}
-
-// 函数用途：打印拓展信息（2 级）
-// 参数：
-//   message: 要打印的调试信息
-inline void infoPrint(const std::string& message) {
-    if (logLevel >= 2) spdlog::info(message);
-}
-
-// 函数用途：打印调试信息（3 级）
-// 参数：
-//   message: 要打印的调试信息
-inline void debugPrint(const std::string& message) {
-    if (logLevel >= 3) spdlog::debug(message);
-}
-
 // 函数用途：格式化执行用时
 // 参数：
 //   seconds: 秒数
@@ -65,9 +30,6 @@ inline std::string formatDuration(double seconds, int precision = 2) {
 inline void waitWithSpinner(const std::string& label,
     std::function<bool()> predicate,
     int interval_ms = 100) {
-    // 如果日志等级低于 1，则跳过 spinner（用于控制日志输出级别）
-    if (logLevel < 1) return;
-
     // 定义转圈动画的字符序列
     static const char spinner[ ] = "|/-\\";
     int count = 0;
@@ -77,7 +39,7 @@ inline void waitWithSpinner(const std::string& label,
         // 每隔若干次（可调）输出一个 spinner 字符，避免频繁刷新
         if (count % 10 == 0) {
             int idx = (count / 10) % (sizeof(spinner) - 1);  // 计算当前使用的 spinner 字符索引
-            std::cerr << "\r\033[33m"  // 输出回车 + 黄色文本（ANSI 转义码）
+            std::cerr << "\r\033[1;33m"  // 输出回车 + 黄色文本（ANSI 转义码）
                 << "[W] " << label << " " << spinner[idx]    // 显示标签和 spinner
                 << std::flush;                               // 刷新输出
         }
@@ -90,5 +52,5 @@ inline void waitWithSpinner(const std::string& label,
     // 清除 spinner 行（输出空格覆盖原内容），保持终端整洁
     std::cerr << "\r"
         << std::string(label.size() + 10, ' ')
-        << "\r" << std::flush;
+        << "\033[0m\r" << std::flush;
 }
